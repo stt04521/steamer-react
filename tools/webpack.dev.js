@@ -8,7 +8,7 @@ var config = require('./config'),
     configWebpack = config.webpack;
 
 var HtmlResWebpackPlugin = require('html-res-webpack-plugin'),
-    ExtractTextPlugin = require("extract-text-webpack-plugin-steamer"),
+    ExtractTextPlugin = require("extract-text-webpack-plugin"),
     CopyWebpackPlugin = require("copy-webpack-plugin-hash");
 
 var devConfig = {
@@ -35,7 +35,7 @@ var devConfig = {
                         ["transform-react-jsx", { "pragma":"preact.h" }]
                     ],
                     presets: [
-                        'es2015-loose', 
+                        'es2015-webpack', 
                     ]
                 },
                 exclude: /node_modules/,
@@ -56,12 +56,12 @@ var devConfig = {
             {
                 test: /\.css$/,
                 // 单独抽出样式文件
-                loader: ExtractTextPlugin.extract("style-loader", "css-loader"),
+                loader: ExtractTextPlugin.extract(["style", "css"]),
                 include: path.resolve(configWebpack.path.src)
             },
             {
                 test: /\.less$/,
-                loader: ExtractTextPlugin.extract("style-loader", "css-loader!less-loader"),
+                loader: ExtractTextPlugin.extract(["style", "css", "less"]),
                 include: path.resolve(configWebpack.path.src)
             },
             {
@@ -86,8 +86,8 @@ var devConfig = {
         ]
     },
     resolve: {
-        moduledirectories:['node_modules', configWebpack.path.src],
-        extensions: ["", ".js", ".jsx", ".es6", "css", "scss", "png", "jpg", "jpeg", "ico"],
+        modules:['node_modules', configWebpack.path.src],
+        extensions: [".js", ".jsx", ".es6", "css", "scss", "png", "jpg", "jpeg", "ico"],
         alias: {
             'redux': 'redux/dist/redux',
             'react-redux': 'react-redux/dist/react-redux',
@@ -103,6 +103,10 @@ var devConfig = {
         }
     },
     plugins: [
+        new webpack.LoaderOptionsPlugin({
+          minimize: true,
+          debug: true
+        }),
         new webpack.optimize.OccurrenceOrderPlugin(true),
         new CopyWebpackPlugin([
             {
@@ -110,11 +114,7 @@ var devConfig = {
                 to: 'libs/'
             }
         ]),
-        new ExtractTextPlugin("./css/[name].css", {filenamefilter: function(filename) {
-            // 由于entry里的chunk现在都带上了js/，因此，这些chunk require的css文件，前面也会带上./js的路径
-            // 因此要去掉才能生成到正确的路径/css/xxx.css，否则会变成/css/js/xxx.css
-            return filename.replace('/js', '');
-        }, disable: true}),
+        new ExtractTextPlugin({filename: "./css/[name].css", disable: true}),
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NoErrorsPlugin()
     ],
@@ -123,12 +123,12 @@ var devConfig = {
     // devtool: "#inline-source-map",
 };
 
-devConfig.addPlugins = function(plugin, opt) {
+var addPlugins = function(plugin, opt) {
     devConfig.plugins.push(new plugin(opt));
 };
 
 configWebpack.html.forEach(function(page) {
-    devConfig.addPlugins(HtmlResWebpackPlugin, {
+    addPlugins(HtmlResWebpackPlugin, {
         mode: "html",
         filename: page + ".html",
         template: "src/" + page + ".html",
