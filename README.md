@@ -72,7 +72,6 @@ starter-kit使用官方推荐的`react-router-redux`和`react-router`进行路�
 ### 特殊插件
 为了更好地生产的部署，将使用的一些插件做了修改，并且发到npm上，可参考相应文档：
 * [copy-webpack-plugin-hash](https://www.npmjs.com/package/copy-webpack-plugin-hash)
-* [extract-text-webpack-plugin-steamer](https://www.npmjs.com/package/extract-text-webpack-plugin-steamer)
 
 ### 支持开发环境与生产环境分离
 #### 文件目录
