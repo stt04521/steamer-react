@@ -10,7 +10,9 @@ var webpackConfig = require("./webpack.dev.js"),
 var port = config.server.port;
 
 for (var key in webpackConfig.entry) {
-	webpackConfig.entry[key].unshift('webpack-hot-middleware/client');
+	if (key !== 'pindex') {
+		webpackConfig.entry[key].unshift('webpack-hot-middleware/client');
+	}
 }
 
 var compiler = webpack(webpackConfig);

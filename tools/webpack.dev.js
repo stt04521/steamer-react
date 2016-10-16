@@ -11,6 +11,8 @@ var HtmlResWebpackPlugin = require('html-res-webpack-plugin'),
     ExtractTextPlugin = require("extract-text-webpack-plugin"),
     CopyWebpackPlugin = require("copy-webpack-plugin-hash");
 
+// var StatsPlugin = require('stats-webpack-plugin');
+
 var devConfig = {
     entry: configWebpack.entry,
     output: {
@@ -44,7 +46,7 @@ var devConfig = {
                 test: /\.js$/,
                 loader: 'babel',
                 query: {
-                    // cacheDirectory: './webpack_cache/',
+                    cacheDirectory: './webpack_cache/',
                     plugins: ['transform-decorators-legacy'],
                     presets: [
                         'es2015-loose', 
@@ -86,7 +88,7 @@ var devConfig = {
         ]
     },
     resolve: {
-        modules:['node_modules', configWebpack.path.src],
+        // modules:[path.join(path.dirname(__dirname), 'node_modules'), configWebpack.path.src],
         extensions: [".js", ".jsx", ".es6", "css", "scss", "png", "jpg", "jpeg", "ico"],
         alias: {
             'redux': 'redux/dist/redux',
@@ -104,10 +106,9 @@ var devConfig = {
     },
     plugins: [
         new webpack.LoaderOptionsPlugin({
-          minimize: true,
-          debug: true
+            minimize: true,
+            debug: true
         }),
-        new webpack.optimize.OccurrenceOrderPlugin(true),
         new CopyWebpackPlugin([
             {
                 from: 'src/libs/',
@@ -123,12 +124,8 @@ var devConfig = {
     // devtool: "#inline-source-map",
 };
 
-var addPlugins = function(plugin, opt) {
-    devConfig.plugins.push(new plugin(opt));
-};
-
 configWebpack.html.forEach(function(page) {
-    addPlugins(HtmlResWebpackPlugin, {
+    utils.addPlugins(devConfig, HtmlResWebpackPlugin, {
         mode: "html",
         filename: page + ".html",
         template: "src/" + page + ".html",
@@ -147,5 +144,11 @@ configWebpack.html.forEach(function(page) {
         }
     });
 }); 
+
+// utils.addPlugins(devConfig, StatsPlugin, {
+//     chunkModules: true,
+//     exclude: [/node_modules[\\\/]react/]
+// });
+
 
 module.exports = devConfig;

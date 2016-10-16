@@ -1,6 +1,7 @@
 'use strict';
 
 const path = require('path'),
+      os = require('os'),
       utils = require('./utils'),
       webpack = require('webpack');
 
@@ -9,17 +10,19 @@ var config = require('./config'),
 
 var HtmlResWebpackPlugin = require('html-res-webpack-plugin'),
     Clean = require('clean-webpack-plugin'),
-    ExtractTextPlugin = require("extract-text-webpack-plugin-steamer"),
+    ExtractTextPlugin = require("extract-text-webpack-plugin"),
     CopyWebpackPlugin = require("copy-webpack-plugin-hash"),
-    WebpackMd5Hash = require('webpack-md5-hash');
+    WebpackMd5Hash = require('webpack-md5-hash'),
+    UglifyJsParallelPlugin = require('webpack-uglify-parallel');
+ 
 
 var prodConfig = {
     entry: configWebpack.entry,
     output: {
         publicPath: configWebpack.cdn,
         path: path.join(configWebpack.path.pub),
-        filename: "[name]-" + configWebpack.chunkhash + ".js",
-        chunkFilename: "chunk/[name]-" + configWebpack.chunkhash + ".js",
+        filename: "js/[name]-" + configWebpack.chunkhash + ".js",
+        chunkFilename: "js/chunk/[name]-" + configWebpack.chunkhash + ".js",
     },
     module: {
         loaders: [
@@ -53,12 +56,12 @@ var prodConfig = {
             {
                 test: /\.css$/,
                 // 单独抽出样式文件
-                loader: ExtractTextPlugin.extract("style-loader", "css-loader"),
+                loader: ExtractTextPlugin.extract(["css"]),
                 include: path.resolve(configWebpack.path.src)
             },
             {
                 test: /\.less$/,
-                loader: ExtractTextPlugin.extract("style-loader", "css-loader!less-loader"),
+                loader: ExtractTextPlugin.extract([ "css", "less"]),
                 include: path.resolve(configWebpack.path.src)
             },
             {
@@ -70,6 +73,7 @@ var prodConfig = {
                 loaders: [
                     "url-loader?limit=1000&name=img/[name]" + configWebpack.hash + ".[ext]",
                     // 压缩png图片
+                    // 'image-webpack?bypassOnDebug&optimizationLevel=7&interlaced=false',
                     'image-webpack?{progressive:true, optimizationLevel: 7, interlaced: false, pngquant:{quality: "65-90", speed: 4}}'
                 ],
                 include: path.resolve(configWebpack.path.src)
@@ -85,8 +89,8 @@ var prodConfig = {
         ]
     },
     resolve: {
-    	moduledirectories:['node_modules', configWebpack.path.src],
-        extensions: ["", ".js", ".jsx", ".es6", "css", "scss", "png", "jpg", "jpeg", "ico"],
+    	// moduledirectories:['node_modules', configWebpack.path.src],
+        extensions: [".js", ".jsx", ".es6", "css", "scss", "png", "jpg", "jpeg", "ico"],
         alias: {
         	// 使用压缩版本redux
             'redux': 'redux/dist/redux.min',
@@ -120,16 +124,19 @@ var prodConfig = {
             namePattern: "[name]-" + configWebpack.contenthash + ".js"
         }),
         new webpack.optimize.OccurrenceOrderPlugin(true),
-        new ExtractTextPlugin("./css/[name]-" + configWebpack.contenthash + ".css", {filenamefilter: function(filename) {
-            // 由于entry里的chunk现在都带上了js/，因此，这些chunk require的css文件，前面也会带上./js的路径
-            // 因此要去掉才能生成到正确的路径/css/xxx.css，否则会变成/css/js/xxx.css
-            return filename.replace('/js', '');
-        }}),
-        new webpack.optimize.UglifyJsPlugin({
-            compress: {
-                warnings: false
-            }
-        }),
+        new ExtractTextPlugin({filename: "./css/[name].css", allChunks: true}),
+        // new UglifyJsParallelPlugin({
+        //     workers: os.cpus().length, // usually having as many workers as cpu cores gives good results 
+        //     // other uglify options 
+        //     compress: {
+        //         warnings: false,
+        //     },
+        // }),
+        // new webpack.optimize.UglifyJsPlugin({
+        //     compress: {
+        //         warnings: false
+        //     }
+        // }),
         new WebpackMd5Hash(),
         new webpack.NoErrorsPlugin()
     ],
@@ -140,14 +147,11 @@ var prodConfig = {
         'preact': 'preact',
     },
     watch: false, //  watch mode
-};
-
-prodConfig.addPlugins = function(plugin, opt) {
-    prodConfig.plugins.push(new plugin(opt));
+    devtool: "#inline-source-map",
 };
 
 configWebpack.html.forEach(function(page) {
-    prodConfig.addPlugins(HtmlResWebpackPlugin, {
+    utils.addPlugins(prodConfig, HtmlResWebpackPlugin, {
         mode: "html",
         filename: page + ".html",
         template: "src/" + page + ".html",

@@ -44,12 +44,16 @@ module.exports = {
 			extensions.map((ext, index) => {
 				let jsPath = path.join(srcPath, jsDirectory, item, 'main.' + ext);
 				if (fs.existsSync(jsPath)) {
-					jsFileArray['js/' + item] = [jsPath];
+					jsFileArray[item] = [jsPath];
 				}
 			});
 		});
 
 		// console.log(jsFileArray);
 		return jsFileArray;
+	},
+
+	addPlugins: function(conf, plugin, opt) {
+		conf.plugins.push(new plugin(opt));
 	}
 };

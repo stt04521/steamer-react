@@ -5,3 +5,4 @@ node_modules1
 pub
 dev
 .DS_Store
+webpack_cache
