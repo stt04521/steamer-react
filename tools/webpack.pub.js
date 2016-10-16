@@ -126,18 +126,18 @@ var prodConfig = {
         }),
         new webpack.optimize.OccurrenceOrderPlugin(true),
         new ExtractTextPlugin({filename: "./css/[name].css", allChunks: true}),
-        // new UglifyJsParallelPlugin({
-        //     workers: os.cpus().length, // usually having as many workers as cpu cores gives good results 
-        //     // other uglify options 
-        //     compress: {
-        //         warnings: false,
-        //     },
-        // }),
         // new webpack.optimize.UglifyJsPlugin({
         //     compress: {
         //         warnings: false
         //     }
         // }),
+        new UglifyJsParallelPlugin({
+            workers: os.cpus().length, // usually having as many workers as cpu cores gives good results 
+            // other uglify options 
+            compress: {
+                warnings: false,
+            },
+        }),
         new WebpackMd5Hash(),
         new webpack.NoErrorsPlugin()
     ],
