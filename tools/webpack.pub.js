@@ -97,7 +97,8 @@ var prodConfig = {
             'react-redux': 'react-redux/dist/react-redux',
             'utils': path.join(configWebpack.path.src, '/js/common/utils'),
             'spin': path.join(configWebpack.path.src, '/js/common/spin'),
-            'spinner': path.join(configWebpack.path.src, '/page/common/components/spinner/'),
+            'spinner': path.join(configWebpack.path.src, '/page/common/components/spinner/index.js'),
+            'spinner-p': path.join(configWebpack.path.src, '/page/common/components/spinner/index-p.js'),
             'net': path.join(configWebpack.path.src, '/js/common/net'),
             'touch': path.join(configWebpack.path.src, '/page/common/components/touch/index.js'),
             'touch-p': path.join(configWebpack.path.src, '/page/common/components/touch/index-p.js'),
@@ -147,7 +148,6 @@ var prodConfig = {
         'preact': 'preact',
     },
     watch: false, //  watch mode
-    devtool: "#inline-source-map",
 };
 
 configWebpack.html.forEach(function(page) {
