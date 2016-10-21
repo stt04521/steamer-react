@@ -19,19 +19,19 @@ var devConfig = {
         publicPath: configWebpack.defaultPath,
         path: path.join(configWebpack.path.dev),
         filename: "[name].js",
-        chunkFilename: "chunk/[name].js",
+        chunkFilename: "chunk/chunk.[name].js",
     },
     module: {
-        loaders: [
+        rules: [
             { 
                 test: /\.js$/,
-                loaders: ['react-hot'],
+                loader: 'react-hot',
                 exclude: /node_modules/,
             },
             { 
                 test: /\.jsx$/,
                 loader: 'babel',
-                query: {
+                options: {
                     "plugins": [
                         ["transform-decorators-legacy"],
                         ["transform-react-jsx", { "pragma":"preact.h" }]
@@ -45,11 +45,12 @@ var devConfig = {
             { 
                 test: /\.js$/,
                 loader: 'babel',
-                query: {
+                options: {
                     cacheDirectory: './webpack_cache/',
                     plugins: ['transform-decorators-legacy'],
                     presets: [
-                        'es2015-loose', 
+                        'es2015-loose-native-modules',
+                        // 'es2015-loose', 
                         'react',
                     ]
                 },
@@ -72,9 +73,11 @@ var devConfig = {
             },
             {
                 test: /\.(jpe?g|png|gif|svg)$/i,
-                loaders: [
-                    "url-loader?limit=1000&name=img/[name].[ext]",
-                ],
+                loader: "url-loader",
+                options: {
+                    limit: 1000,
+                    "name": "img/[name].[ext]",
+                },
                 include: path.resolve(configWebpack.path.src)
             },
             {
@@ -88,8 +91,9 @@ var devConfig = {
         ]
     },
     resolve: {
+        // unsafeCache: true, // 9s -> 8s, 如果有任何路径修改，这里请先设为false，构建完一次后，再设为true
         // modules:[path.join(path.dirname(__dirname), 'node_modules'), configWebpack.path.src],
-        extensions: [".js", ".jsx", ".es6", "css", "scss", "png", "jpg", "jpeg", "ico"],
+        extensions: [".js", ".jsx", "css", "less", "scss", "png", "jpg", "jpeg", "ico"],
         alias: {
             'redux': 'redux/dist/redux',
             'react-redux': 'react-redux/dist/react-redux',
@@ -120,7 +124,7 @@ var devConfig = {
         new webpack.HotModuleReplacementPlugin(),
         new webpack.NoErrorsPlugin()
     ],
-    watch: true, //  watch mode
+    // watch: true, //  watch mode
     // 是否添加source-map，可去掉注释开启
     // devtool: "#inline-source-map",
 };

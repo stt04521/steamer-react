@@ -5,11 +5,11 @@ import { Provider } from 'react-redux';
 import { configureStore } from '../stores/configureStore';
 import initialStore from '../stores/stores';
 
-import IndexWrapper from '../container/index';
-import CommentWrapper from '../container/comment';
-import DetailWrapper from '../container/detail';
+// import IndexWrapper from '../container/index';
+// import CommentWrapper from '../container/comment';
+// import DetailWrapper from '../container/detail';
 
-import App from '../container/app';
+// import App from '../container/app';
 
 import { syncHistoryWithStore } from 'react-router-redux';
 
@@ -30,13 +30,14 @@ export default class Root extends Component {
         return (
             <Provider store={store}>
                 <div>
-                    <Router history={history}>
+                    {/** <Router history={history}>
                         <Route path="/" component={App}>
                             <IndexRoute component={IndexWrapper}/>
                             <Route path="comment/:id" component={CommentWrapper}/>
                             <Route path="detail/:id/:commentid" component={DetailWrapper}/>
                         </Route>
-                    </Router>
+                    </Router> **/}
+                    <Router history={history} routes={routeConfig} />
                 </div>
             </Provider>
         );
