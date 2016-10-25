@@ -7,3 +7,4 @@ pub
 dev
 .DS_Store
 webpack_cache
+.happypack
